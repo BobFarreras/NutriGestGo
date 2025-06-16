@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "701717958510",
+    "project_id": "nutrigestgo-5fa0f",
+    "storage_bucket": "nutrigestgo-5fa0f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:701717958510:android:37800706f81e95bb067b7f",
+        "android_client_info": {
+          "package_name": "com.deixebledenkaito.nutrigestgo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCjrZWkpFZEmQRs06yDtqSbyxky_Kjm1Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
