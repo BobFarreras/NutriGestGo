@@ -1,4 +1,4 @@
-package com.deixebledenkaito.nutrigestgo.domain.modul
+package com.deixebledenkaito.nutrigestgo.domain.model
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

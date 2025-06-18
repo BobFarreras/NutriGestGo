@@ -1,4 +1,4 @@
-package com.deixebledenkaito.nutrigestgo.ui.home.topBar
+package com.deixebledenkaito.nutrigestgo.ui.home.HomePerfil
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

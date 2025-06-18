@@ -1,8 +1,9 @@
 package com.deixebledenkaito.nutrigestgo.ui.formulari
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,8 +18,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,22 +27,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.google.firebase.firestore.FirebaseFirestore
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.with
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.BakeryDining
@@ -69,37 +62,33 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.vector.ImageVector
 
-import androidx.compose.ui.text.font.FontWeight
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.deixebledenkaito.nutrigestgo.domain.model.Formulari
+import kotlinx.coroutines.launch
 
-import androidx.compose.ui.unit.sp
 
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun FormulariPostRegistre(
-    userEmail: String,
+    viewModel: FormulariViewModel = hiltViewModel(),
+    userEmail : String,
     onFormSaved: () -> Unit
+
 ) {
     val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
 
+    // Aquí agafem l’estat del formulari des del ViewModel
+    val formulari by viewModel.formulari
+    val scope = rememberCoroutineScope()
+
     // Estadístiques formulari
-    var tempsCuinar by remember { mutableStateOf("") }
-    var pressupost by remember { mutableStateOf("") }
+    var tempsCuinar by remember { mutableStateOf(formulari.tempsCuinar.toString()) }
+    var pressupost by remember {  mutableStateOf(formulari.pressupost.toString())}
     var alergies by remember { mutableStateOf(listOf<String>()) }
 
-    // Opcions i selecció
-    val alergiesOptions = listOf(
-        "Cap" to Icons.Filled.CheckCircle,
-        "Gluten" to Icons.Filled.BakeryDining,
-        "Lactosa" to Icons.Filled.LocalDrink,
-        "Fruits secs" to Icons.Filled.Cookie,  // Aquesta icona és fictícia, pots posar una altra
-        "Marisc" to Icons.Filled.SetMeal,
-        "Ou" to Icons.Filled.Egg, // També fictícia, busca alternativa
-        "Altres" to Icons.Filled.HelpOutline
-    )
     var alergiesSelected by remember { mutableStateOf("Cap") }
 
     val nutricioOptions = listOf(
@@ -109,14 +98,14 @@ fun FormulariPostRegistre(
         "Crudivegana" to Icons.Filled.LocalFlorist,
         "Pescetariana" to Icons.Filled.SetMeal
     )
-    var nutricioSelected by remember { mutableStateOf<String?>(null) }
+    var nutricioSelected by remember { mutableStateOf<String?>(formulari.nutricio) }
 
     val objectiusOptions = listOf(
         "Equilibrada" to Icons.Filled.Balance,
         "Terapèutica" to Icons.Filled.Healing,
         "Esportiva" to Icons.Filled.FitnessCenter
     )
-    var objectiuSelected by remember { mutableStateOf<String?>(null) }
+    var objectiuSelected by remember { mutableStateOf<String?>(formulari.objectiuSalut) }
 
     val restriccionsOptions = listOf(
         "Sense gluten" to Icons.Filled.NoFood,
@@ -124,12 +113,15 @@ fun FormulariPostRegistre(
         "Cetogènica (Keto)" to Icons.Filled.Grass,
         "Paleolítica" to Icons.Filled.Forest
     )
-    var restriccioSelected by remember { mutableStateOf<String?>(null) }
+    var restriccioSelected by remember { mutableStateOf<String?>(formulari.restriccio) }
 
     var step by remember { mutableStateOf(0) }
     var error by remember { mutableStateOf<String?>(null) }
 
-
+    // Actualitza el formulari amb l’entrada de l’usuari
+    fun updateForm(update: Formulari.() -> Formulari) {
+        viewModel.updateForm(update(formulari))
+    }
 
     Box(
         modifier = Modifier
@@ -169,8 +161,15 @@ fun FormulariPostRegistre(
                                 )
                                 Spacer(Modifier.height(12.dp))
                                 OutlinedTextField(
-                                    value = tempsCuinar,
-                                    onValueChange = { tempsCuinar = it.filter { c -> c.isDigit() } },
+                                    value = formulari.tempsCuinar.toString(),
+                                    onValueChange = { input ->
+                                        val filtered = input.filter { it.isDigit() }
+                                        if (filtered.isNotEmpty()) {
+                                            updateForm { copy(tempsCuinar = filtered.toInt()) }
+                                        } else {
+                                            updateForm { copy(tempsCuinar = 0) }
+                                        }
+                                    },
                                     label = { Text("Temps en minuts") },
                                     singleLine = true,
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -188,8 +187,15 @@ fun FormulariPostRegistre(
                                 )
                                 Spacer(Modifier.height(12.dp))
                                 OutlinedTextField(
-                                    value = pressupost,
-                                    onValueChange = { pressupost = it.filter { c -> c.isDigit() || c == '.' } },
+                                    value = formulari.pressupost.toString(),
+                                    onValueChange = { input ->
+                                        val filtered = input.filter { it.isDigit() }
+                                        if (filtered.isNotEmpty()) {
+                                            updateForm { copy(pressupost = filtered.toDouble()) }
+                                        } else {
+                                            updateForm { copy(pressupost = 0.0) }
+                                        }
+                                    },
                                     label = { Text("Pressupost en €") },
                                     singleLine = true,
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -221,9 +227,14 @@ fun FormulariPostRegistre(
                                 )
                                 Spacer(Modifier.height(12.dp))
                                 nutricioOptions.forEach { (label, icon) ->
-                                    OpcioRadio(label, icon, nutricioSelected == label) {
-                                        nutricioSelected = label
-                                    }
+                                    OpcioRadio(
+                                        label = label,
+                                        icon = icon,
+                                        selected = nutricioSelected == label,
+                                        onSelect = { nutricioSelected = label },
+                                        modifier = Modifier.padding(vertical = 4.dp)
+                                    )
+
                                 }
                             }
                         }
@@ -236,9 +247,13 @@ fun FormulariPostRegistre(
                                 )
                                 Spacer(Modifier.height(12.dp))
                                 objectiusOptions.forEach { (label, icon) ->
-                                    OpcioRadio(label, icon, objectiuSelected == label) {
-                                        objectiuSelected = label
-                                    }
+                                    OpcioRadio(
+                                        label = label,
+                                        icon = icon,
+                                        selected = objectiuSelected == label,
+                                        onSelect = { objectiuSelected = label },
+                                        modifier = Modifier.padding(vertical = 4.dp)
+                                    )
                                 }
                             }
                         }
@@ -251,9 +266,14 @@ fun FormulariPostRegistre(
                                 )
                                 Spacer(Modifier.height(12.dp))
                                 restriccionsOptions.forEach { (label, icon) ->
-                                    OpcioRadio(label, icon, restriccioSelected == label) {
-                                        restriccioSelected = label
-                                    }
+                                    OpcioRadio(
+                                        label = label,
+                                        icon = icon,
+                                        selected = restriccioSelected == label,
+                                        onSelect = { restriccioSelected = label },
+                                        modifier = Modifier.padding(vertical = 4.dp)
+                                    )
+
                                 }
                             }
                         }
@@ -310,30 +330,26 @@ fun FormulariPostRegistre(
                                     if (restriccioSelected == null) {
                                         error = "Selecciona una restricció alimentària"
                                     } else {
-                                        // Guardar a Firestore
-                                        val firestore = FirebaseFirestore.getInstance()
-                                        val docRef = firestore.collection("Usuaris")
-                                            .document(userEmail)
-                                            .collection("formulari")
-                                            .document("info")
-
-                                        val dades = mapOf(
-                                            "tempsCuinar" to tempsCuinar.toInt(),
-                                            "pressupost" to pressupost.toDouble(),
-                                            "alergies" to alergies,
-                                            "nutricio" to nutricioSelected,
-                                            "objectiuSalut" to objectiuSelected,
-                                            "restriccio" to restriccioSelected
-                                        )
-
-                                        docRef.set(dades)
-                                            .addOnSuccessListener {
+                                        // ✅ Actualitza el formulari amb totes les opcions escollides
+                                        updateForm {
+                                            copy(
+                                                nutricio = nutricioSelected,
+                                                alergies = alergies,
+                                                objectiuSalut = objectiuSelected,
+                                                restriccio = restriccioSelected
+                                            )
+                                        }
+                                        Log.d("FormulariPostRegistre", "Formulari: $formulari")
+                                        // ✅ Guarda al ViewModel
+                                        scope.launch {
+                                            val result = viewModel.saveForm(userEmail)
+                                            if (result.isSuccess) {
                                                 Toast.makeText(context, "Formulari desat correctament", Toast.LENGTH_SHORT).show()
                                                 onFormSaved()
+                                            } else {
+                                                error = result.exceptionOrNull()?.localizedMessage ?: "Error desconegut"
                                             }
-                                            .addOnFailureListener {
-                                                error = "Error desant el formulari: ${it.localizedMessage}"
-                                            }
+                                        }
                                     }
                                 }
                             }

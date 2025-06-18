@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
     kotlin("kapt")
+    alias(libs.plugins.androidHilt)
     alias(libs.plugins.googleServices)
     id("com.google.firebase.crashlytics")
 }

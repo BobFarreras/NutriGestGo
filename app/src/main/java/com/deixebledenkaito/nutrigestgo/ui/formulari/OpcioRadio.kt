@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.MaterialTheme.colors
@@ -29,36 +31,44 @@ fun OpcioRadio(
     label: String,
     icon: ImageVector,
     selected: Boolean,
-    onSelect: () -> Unit
+    onSelect: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.colorScheme
+    val backgroundColor = if (selected) colors.primary.copy(alpha = 0.1f) else Color.Transparent
+    val textColor = if (selected) colors.primary else colors.onSurface
+    val iconColor = if (selected) colors.primary else colors.onSurfaceVariant
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { onSelect() }
-            .padding(vertical = 8.dp)
-            .background(
-                if (selected) colors.primary else Color.Transparent,
-                RoundedCornerShape(12.dp)
-            )
+            .background(backgroundColor, RoundedCornerShape(12.dp))
             .padding(horizontal = 12.dp, vertical = 10.dp)
     ) {
         RadioButton(
             selected = selected,
-            onClick = null,
+            onClick = null, // El click se maneja en el Row
             colors = RadioButtonDefaults.colors(
                 selectedColor = colors.primary,
-                unselectedColor = colors.onSurface
+                unselectedColor = colors.onSurfaceVariant
             )
         )
         Spacer(Modifier.width(12.dp))
-        Icon(icon, contentDescription = null, tint = colors.primary, modifier = Modifier.size(28.dp))
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = iconColor,
+            modifier = Modifier.size(24.dp)
+        )
         Spacer(Modifier.width(16.dp))
         Text(
-            label,
-            fontSize = 18.sp,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-            color = if (selected) colors.primary else colors.onSurface
+            text = label,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = textColor,
+                fontWeight = if (selected) FontWeight.Medium else FontWeight.Normal
+            )
         )
     }
 }
