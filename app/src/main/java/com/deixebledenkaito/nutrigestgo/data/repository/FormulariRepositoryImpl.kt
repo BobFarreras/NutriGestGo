@@ -47,4 +47,21 @@ class FormulariRepositoryImpl @Inject constructor(
             false
         }
     }
+
+    override suspend fun getFormulari(userEmail: String): Formulari? {
+        return try {
+            val doc = firestore.collection("Usuaris")
+                .document(userEmail)
+                .collection("formulari")
+                .document("info")
+                .get()
+                .await()
+
+            if (doc.exists()) {
+                doc.toObject(Formulari::class.java)
+            } else null
+        } catch (e: Exception) {
+            null
+        }
+    }
 }

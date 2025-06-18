@@ -6,6 +6,7 @@ import com.deixebledenkaito.nutrigestgo.domain.usecase.auth.LoginUseCase
 import com.deixebledenkaito.nutrigestgo.domain.usecase.auth.LogoutUseCase
 import com.deixebledenkaito.nutrigestgo.domain.usecase.auth.SignupUseCase
 import com.deixebledenkaito.nutrigestgo.domain.usecase.formulari.CheckFormCompletedUseCase
+import com.deixebledenkaito.nutrigestgo.domain.usecase.formulari.SaveFormUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,6 +35,12 @@ object UseCaseModule {
     fun provideCheckFormCompletedUseCase(repository: FormulariRepository): CheckFormCompletedUseCase {
         return CheckFormCompletedUseCase(repository)
     }
+
+    @Provides
+    fun provideSaveFormUseCase(repository: FormulariRepository): SaveFormUseCase {
+        return SaveFormUseCase(repository)
+    }
+
 
 
 }

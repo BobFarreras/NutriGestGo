@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.clip
 
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.deixebledenkaito.nutrigestgo.domain.model.BottomNavItem
@@ -66,7 +67,7 @@ fun HomeScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Benvingut/da, ${user?.email ?: "Usuari"}") },
+                title = { Text("Benvingut/da") },
                 actions = {
                     Box {
                         if (profilePhotoUrl != null) {
