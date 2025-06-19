@@ -36,6 +36,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachMoney
@@ -45,6 +46,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Cookie
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Egg
+import androidx.compose.material.icons.filled.Euro
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Forest
 import androidx.compose.material.icons.filled.Grass
@@ -62,9 +64,15 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.deixebledenkaito.nutrigestgo.domain.model.Formulari
+import com.deixebledenkaito.nutrigestgo.ui.components.BackgroundApp
+import com.deixebledenkaito.nutrigestgo.ui.components.Colors
 import kotlinx.coroutines.launch
 
 
@@ -126,13 +134,14 @@ fun FormulariPostRegistre(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.background),
+            .background(BackgroundApp().backgroundColor),
         contentAlignment = Alignment.Center
     ) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth(0.85f)
                 .wrapContentHeight()
+                .offset(y = (-45).dp) // 🔹 Això el puja visualment
                 .shadow(8.dp, RoundedCornerShape(20.dp)),
             color = colors.surface,
             shape = RoundedCornerShape(20.dp)
@@ -141,11 +150,11 @@ fun FormulariPostRegistre(
                 modifier = Modifier
                     .padding(28.dp)
                     .animateContentSize(animationSpec = tween(400)),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 Text(
                     "Pas ${step + 1} de 6",
-                    style = MaterialTheme.typography.labelLarge.copy(color = colors.primary)
+                    style = MaterialTheme.typography.labelLarge.copy(color = Colors().colorTitle)
                 )
                 AnimatedContent<Int>(
                     targetState = step,
@@ -153,13 +162,20 @@ fun FormulariPostRegistre(
                 ) { currentStep ->
                     when (currentStep) {
                         0 -> {
-                            Column {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
                                 Text(
-                                    "Quant temps pots dedicar a cuinar?",
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    color = colors.onSurface
+                                    "⏳ Quant de temps pots dedicar a cuinar?",
+                                    style = MaterialTheme.typography.headlineSmall.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = Colors().colorTitle
+                                    )
                                 )
-                                Spacer(Modifier.height(12.dp))
+
                                 OutlinedTextField(
                                     value = formulari.tempsCuinar.toString(),
                                     onValueChange = { input ->
@@ -170,37 +186,114 @@ fun FormulariPostRegistre(
                                             updateForm { copy(tempsCuinar = 0) }
                                         }
                                     },
-                                    label = { Text("Temps en minuts") },
+                                    label = {
+                                        Text(
+                                            "Temps en minuts",
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                color =  Colors().colorTitle
+
+                                            )
+                                        )
+                                    },
                                     singleLine = true,
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    leadingIcon = { Icon(Icons.Default.Timer, contentDescription = null) },
-                                    modifier = Modifier.fillMaxWidth()
+                                    // 🔹 Estil del text dins del input
+                                    textStyle = MaterialTheme.typography.titleLarge.copy(
+//                                        textAlign = TextAlign.Center,       // Centrat horitzontalment
+                                        fontSize = 20.sp                    // Mida del text
+                                    ),
+                                    leadingIcon = {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                               ,
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                Icons.Default.Timer,
+                                                contentDescription = null,
+                                                tint = Colors().colorTitle
+                                            )
+                                        }
+                                    },
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Colors().colorTitle,
+                                        unfocusedBorderColor = Colors().colorTitle.copy(alpha = 0.5f),
+                                        cursorColor = Colors().colorTitle,
+                                        focusedLeadingIconColor = Colors().colorTitle,
+                                        unfocusedLeadingIconColor = Colors().colorTitle.copy(alpha = 0.7f),
+                                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedLabelColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                                    ),
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+
                                 )
                             }
+
                         }
                         1 -> {
-                            Column {
+                            Column (
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ){
                                 Text(
-                                    "Quin pressupost mensual tens per menjar?",
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    color = colors.onSurface
+                                    "\uD83D\uDCB3 Quin pressupost mensual tens per menjar?",
+                                    style = MaterialTheme.typography.headlineSmall.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = Colors().colorTitle
+                                    )
                                 )
-                                Spacer(Modifier.height(12.dp))
+
                                 OutlinedTextField(
                                     value = formulari.pressupost.toString(),
                                     onValueChange = { input ->
                                         val filtered = input.filter { it.isDigit() }
                                         if (filtered.isNotEmpty()) {
-                                            updateForm { copy(pressupost = filtered.toDouble()) }
+                                            updateForm { copy(pressupost = filtered.toInt()) }
                                         } else {
-                                            updateForm { copy(pressupost = 0.0) }
+                                            updateForm { copy(pressupost = 0) }
                                         }
                                     },
-                                    label = { Text("Pressupost en €") },
+                                    label = { Text("Pressupost en €",
+                                        style = MaterialTheme.typography.bodyMedium.copy(color =  Colors().colorTitle
+
+                                            )) },
                                     singleLine = true,
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    leadingIcon = { Icon(Icons.Default.AttachMoney, contentDescription = null) },
-                                    modifier = Modifier.fillMaxWidth()
+                                    textStyle = MaterialTheme.typography.titleLarge.copy(
+//                                        textAlign = TextAlign.Center,       // Centrat horitzontalment
+                                        fontSize = 20.sp                    // Mida del text
+                                    ),
+                                    leadingIcon = {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                            ,
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                Icons.Default.Euro,
+                                                contentDescription = null,
+                                                tint = Colors().colorTitle
+                                            )
+                                        }
+                                    },
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Colors().colorTitle,
+                                        unfocusedBorderColor = Colors().colorTitle.copy(alpha = 0.5f),
+                                        cursorColor = Colors().colorTitle,
+                                        focusedLeadingIconColor = Colors().colorTitle,
+                                        unfocusedLeadingIconColor = Colors().colorTitle.copy(alpha = 0.7f),
+                                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedLabelColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                                    ),
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
                                 )
                             }
                         }
@@ -208,10 +301,12 @@ fun FormulariPostRegistre(
                             Column {
                                 Text(
                                     "Tens alguna al·lèrgia?",
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    color = colors.onSurface
+                                    style = MaterialTheme.typography.headlineSmall.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = Colors().colorTitle
+                                    )
                                 )
-                                Spacer(Modifier.height(12.dp))
+                                Spacer(Modifier.height(18.dp))
                                 AlergiesSelector(
                                     selectedAlergies = alergies,
                                     onAlergiesChange = { alergies = it }
@@ -222,8 +317,10 @@ fun FormulariPostRegistre(
                             Column {
                                 Text(
                                     "Selecciona tipus de nutrició",
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    color = colors.onSurface
+                                    style = MaterialTheme.typography.headlineSmall.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = Colors().colorTitle
+                                    )
                                 )
                                 Spacer(Modifier.height(12.dp))
                                 nutricioOptions.forEach { (label, icon) ->
@@ -242,8 +339,10 @@ fun FormulariPostRegistre(
                             Column {
                                 Text(
                                     "Objectiu de salut",
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    color = colors.onSurface
+                                    style = MaterialTheme.typography.headlineSmall.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = Colors().colorTitle
+                                    )
                                 )
                                 Spacer(Modifier.height(12.dp))
                                 objectiusOptions.forEach { (label, icon) ->
@@ -261,8 +360,10 @@ fun FormulariPostRegistre(
                             Column {
                                 Text(
                                     "Restriccions alimentàries",
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    color = colors.onSurface
+                                    style = MaterialTheme.typography.headlineSmall.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = Colors().colorTitle
+                                    )
                                 )
                                 Spacer(Modifier.height(12.dp))
                                 restriccionsOptions.forEach { (label, icon) ->
@@ -298,10 +399,10 @@ fun FormulariPostRegistre(
                     if (step > 0) {
                         Button(
                             onClick = { error = null; step -= 1 },
-                            colors = ButtonDefaults.buttonColors(containerColor = colors.secondaryContainer)
+                            colors = ButtonDefaults.buttonColors(containerColor = Colors().colorTitle.copy(alpha = 0.2f))
                         ) {
                             Icon(Icons.Filled.ArrowBack, contentDescription = "Anterior")
-                            Spacer(Modifier.width(6.dp))
+                            Spacer(Modifier.width(5.dp))
                             Text("Anterior")
                         }
                     } else {
@@ -357,9 +458,9 @@ fun FormulariPostRegistre(
                                 step += 1
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = colors.primary)
+                        colors = ButtonDefaults.buttonColors(containerColor = Colors().colorTitle)
                     ) {
-                        Text(if (step < 5) "Següent" else "Continuar", color = colors.onPrimary)
+                        Text(if (step < 5) "Següent" else "Continuar", color = Color.White, modifier = Modifier.padding(horizontal = 3.dp) )
                     }
                 }
             }

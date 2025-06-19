@@ -84,6 +84,6 @@ dependencies {
     implementation (libs.androidx.material.icons.extended)
     implementation(libs.coil.compose)
 
-
-
+    implementation("androidx.compose.foundation:foundation:1.8.3")
+    implementation("com.google.accompanist:accompanist-flowlayout:0.30.1")
 }

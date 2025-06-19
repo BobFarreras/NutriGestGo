@@ -1,6 +1,8 @@
 package com.deixebledenkaito.nutrigestgo.ui.formulari
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,13 +19,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.MaterialTheme.colors
+import com.deixebledenkaito.nutrigestgo.ui.components.Colors
+
 
 // Funció reusable per mostrar opcions radio amb icona i text compactes
 @Composable
@@ -35,23 +39,28 @@ fun OpcioRadio(
     modifier: Modifier = Modifier
 ) {
     val colors = MaterialTheme.colorScheme
-    val backgroundColor = if (selected) colors.primary.copy(alpha = 0.1f) else Color.Transparent
-    val textColor = if (selected) colors.primary else colors.onSurface
-    val iconColor = if (selected) colors.primary else colors.onSurfaceVariant
+    val backgroundColor = animateColorAsState(
+        if (selected) Color.White.copy(alpha = 0.12f) else colors.surface
+    ).value
+    val textColor = if (selected) Color(0xFFEF6C00) else colors.onSurface
+    val iconColor = if (selected) Color(0xFFEF6C00) else colors.onSurfaceVariant
+
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(backgroundColor)
             .clickable { onSelect() }
-            .background(backgroundColor, RoundedCornerShape(12.dp))
-            .padding(horizontal = 12.dp, vertical = 10.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+
     ) {
         RadioButton(
             selected = selected,
-            onClick = null, // El click se maneja en el Row
+            onClick = null,
             colors = RadioButtonDefaults.colors(
-                selectedColor = colors.primary,
+                selectedColor = Color(0xFFEF6C00),
                 unselectedColor = colors.onSurfaceVariant
             )
         )
@@ -67,7 +76,7 @@ fun OpcioRadio(
             text = label,
             style = MaterialTheme.typography.bodyLarge.copy(
                 color = textColor,
-                fontWeight = if (selected) FontWeight.Medium else FontWeight.Normal
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
             )
         )
     }
